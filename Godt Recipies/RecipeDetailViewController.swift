@@ -24,10 +24,11 @@ class RecipeDetailViewController: UIViewController {
         super.viewWillAppear(animated)
 
         title = recipe?.title
-        descriptionLabel.text = recipe?.fullDescription
+        descriptionLabel.text = recipe?.fullDescription //TODO use WebView for description as it contains links and other HTML tags
         ingredientsLabel.text = recipe?.ingredients
         imageView.image = recipe?.image()
 
+        //TODO deregister old
         // the image might not be loaded yet
         if (recipe != nil) {
             recipe!.addObserver(self, forKeyPath: "imagePath", options: [], context: nil)
