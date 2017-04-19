@@ -21,9 +21,15 @@ class Godt_RecipiesTests: XCTestCase {
         super.tearDown()
     }
     
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    func testFetch() {
+        let provider = RecipesProvider()
+        // TODO name the exp
+        let fetchExpectation = expectation(description: "SomeService does stuff and runs the callback closure")
+        provider.fetch { result in
+            fetchExpectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 10)
     }
     
     func testPerformanceExample() {

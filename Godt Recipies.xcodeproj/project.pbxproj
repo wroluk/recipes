@@ -14,6 +14,11 @@
 		627921411E9F8AAD00F9B150 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 627921401E9F8AAD00F9B150 /* Assets.xcassets */; };
 		627921441E9F8AAD00F9B150 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 627921421E9F8AAD00F9B150 /* LaunchScreen.storyboard */; };
 		6279214F1E9F8AAD00F9B150 /* Godt_RecipiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6279214E1E9F8AAD00F9B150 /* Godt_RecipiesTests.swift */; };
+		6279215B1E9F928B00F9B150 /* RecipeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 627921591E9F928B00F9B150 /* RecipeTableViewCell.swift */; };
+		6279215E1E9F92BB00F9B150 /* RecipeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6279215D1E9F92BB00F9B150 /* RecipeTableViewController.swift */; };
+		628D5F421EA661C400966BF6 /* RecipeDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 628D5F411EA661C400966BF6 /* RecipeDetailViewController.swift */; };
+		858F2604F88028B784E49111 /* Recipe+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858F20FD84EC8D7CB61E2E0D /* Recipe+Extensions.swift */; };
+		858F2E3DE829D72026F87B98 /* RecipesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858F2010A6AFCAEAE61E5C4F /* RecipesProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +43,11 @@
 		6279214A1E9F8AAD00F9B150 /* Godt RecipiesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Godt RecipiesTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6279214E1E9F8AAD00F9B150 /* Godt_RecipiesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Godt_RecipiesTests.swift; sourceTree = "<group>"; };
 		627921501E9F8AAD00F9B150 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		627921591E9F928B00F9B150 /* RecipeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecipeTableViewCell.swift; sourceTree = "<group>"; };
+		6279215D1E9F92BB00F9B150 /* RecipeTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecipeTableViewController.swift; sourceTree = "<group>"; };
+		628D5F411EA661C400966BF6 /* RecipeDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecipeDetailViewController.swift; sourceTree = "<group>"; };
+		858F2010A6AFCAEAE61E5C4F /* RecipesProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecipesProvider.swift; sourceTree = "<group>"; };
+		858F20FD84EC8D7CB61E2E0D /* Recipe+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Recipe+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,10 +92,15 @@
 				627921361E9F8AAD00F9B150 /* AppDelegate.swift */,
 				627921381E9F8AAD00F9B150 /* ViewController.swift */,
 				6279213A1E9F8AAD00F9B150 /* Main.storyboard */,
+				628D5F411EA661C400966BF6 /* RecipeDetailViewController.swift */,
+				627921591E9F928B00F9B150 /* RecipeTableViewCell.swift */,
 				627921401E9F8AAD00F9B150 /* Assets.xcassets */,
 				627921421E9F8AAD00F9B150 /* LaunchScreen.storyboard */,
 				627921451E9F8AAD00F9B150 /* Info.plist */,
 				6279213D1E9F8AAD00F9B150 /* Godt_Recipies.xcdatamodeld */,
+				6279215D1E9F92BB00F9B150 /* RecipeTableViewController.swift */,
+				858F2010A6AFCAEAE61E5C4F /* RecipesProvider.swift */,
+				858F20FD84EC8D7CB61E2E0D /* Recipe+Extensions.swift */,
 			);
 			path = "Godt Recipies";
 			sourceTree = "<group>";
@@ -206,7 +221,12 @@
 			files = (
 				627921391E9F8AAD00F9B150 /* ViewController.swift in Sources */,
 				627921371E9F8AAD00F9B150 /* AppDelegate.swift in Sources */,
+				628D5F421EA661C400966BF6 /* RecipeDetailViewController.swift in Sources */,
 				6279213F1E9F8AAD00F9B150 /* Godt_Recipies.xcdatamodeld in Sources */,
+				6279215B1E9F928B00F9B150 /* RecipeTableViewCell.swift in Sources */,
+				6279215E1E9F92BB00F9B150 /* RecipeTableViewController.swift in Sources */,
+				858F2E3DE829D72026F87B98 /* RecipesProvider.swift in Sources */,
+				858F2604F88028B784E49111 /* Recipe+Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -345,6 +365,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = PGGVK4LP82;
 				INFOPLIST_FILE = "Godt Recipies/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.wroluk.Godt-Recipies";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -358,6 +379,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = PGGVK4LP82;
 				INFOPLIST_FILE = "Godt Recipies/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.wroluk.Godt-Recipies";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -414,6 +436,7 @@
 				627921551E9F8AAD00F9B150 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		627921561E9F8AAD00F9B150 /* Build configuration list for PBXNativeTarget "Godt RecipiesTests" */ = {
 			isa = XCConfigurationList;
@@ -422,6 +445,7 @@
 				627921581E9F8AAD00F9B150 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
