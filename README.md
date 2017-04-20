@@ -37,7 +37,7 @@ Tests
 I added some basic unit tests for processing of recipe data
 
 
-Final remakrks
+Final remarks
 ---------------------
 
 I'm aware that for productive usage the app would have to be still a bit enhanced (real logging instead of print statements, nicer UI, enhanced CoreData stack, crash reporting and analytics, some more comments etc.) but as they say: "leave well alone" and even the best developers need to get some sleep! ;)
