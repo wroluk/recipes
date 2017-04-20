@@ -18,6 +18,7 @@
 		6279215E1E9F92BB00F9B150 /* RecipeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6279215D1E9F92BB00F9B150 /* RecipeTableViewController.swift */; };
 		628D5F421EA661C400966BF6 /* RecipeDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 628D5F411EA661C400966BF6 /* RecipeDetailViewController.swift */; };
 		858F2604F88028B784E49111 /* Recipe+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858F20FD84EC8D7CB61E2E0D /* Recipe+Extensions.swift */; };
+		858F286587D695ED6FA80F03 /* Notes.txt in Resources */ = {isa = PBXBuildFile; fileRef = 858F29565721000BB76D34B2 /* Notes.txt */; };
 		858F2A4E5686A00790817217 /* sampleData.json in Resources */ = {isa = PBXBuildFile; fileRef = 858F29E4D14AEB9C684849EF /* sampleData.json */; };
 		858F2E3DE829D72026F87B98 /* RecipesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858F2010A6AFCAEAE61E5C4F /* RecipesProvider.swift */; };
 /* End PBXBuildFile section */
@@ -48,6 +49,7 @@
 		628D5F411EA661C400966BF6 /* RecipeDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecipeDetailViewController.swift; sourceTree = "<group>"; };
 		858F2010A6AFCAEAE61E5C4F /* RecipesProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecipesProvider.swift; sourceTree = "<group>"; };
 		858F20FD84EC8D7CB61E2E0D /* Recipe+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Recipe+Extensions.swift"; sourceTree = "<group>"; };
+		858F29565721000BB76D34B2 /* Notes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Notes.txt; sourceTree = "<group>"; };
 		858F29E4D14AEB9C684849EF /* sampleData.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = sampleData.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -75,6 +77,7 @@
 				627921351E9F8AAD00F9B150 /* Godt Recipies */,
 				6279214D1E9F8AAD00F9B150 /* Godt RecipiesTests */,
 				627921341E9F8AAD00F9B150 /* Products */,
+				858F29565721000BB76D34B2 /* Notes.txt */,
 			);
 			sourceTree = "<group>";
 		};
@@ -204,6 +207,7 @@
 				627921411E9F8AAD00F9B150 /* Assets.xcassets in Resources */,
 				6279213C1E9F8AAD00F9B150 /* Main.storyboard in Resources */,
 				858F2A4E5686A00790817217 /* sampleData.json in Resources */,
+				858F286587D695ED6FA80F03 /* Notes.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

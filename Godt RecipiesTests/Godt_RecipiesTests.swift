@@ -33,7 +33,7 @@ class Godt_RecipiesTests: XCTestCase {
         let fetchExpectation = expectation(description: "Completion is called after fetching is done")
         provider.fetch { fetchedRecipes in
             fetchExpectation.fulfill()
-            // TODO check something
+            // here we can't check much more as we connect to the real server and the response may change
         }
 
         waitForExpectations(timeout: 60)
@@ -52,6 +52,8 @@ class Godt_RecipiesTests: XCTestCase {
         XCTAssertEqual(50, processedRecipes!.count)
 
         // check some recipes
+
+        // first
         checkRecipe(processedRecipes![0], RecipesProvider.RecipeData(
                 title: "Jalapeño-poppers",
                 fullDescription: "Herlige små smaksbombe-munnfuller!",
@@ -59,12 +61,21 @@ class Godt_RecipiesTests: XCTestCase {
                 ingredients: ["jalapeño", "mozzarella", "eggehvite", "hvetemel", "hvetemel", "maisenna", "bakepulver", "egg", "vann", "fløte", "olje", "aioli", "sriracha", "limesaft"],
                 order: 0))
 
+        // some random recipe
         checkRecipe(processedRecipes![7], RecipesProvider.RecipeData(
                 title: "Wonton-suppe",
                 fullDescription: "En klar suppe med fylte pastaputer - og mye god smak.",
                 imageUrl: "https://imbo.vgc.no/users/godt/images/347a5f6363b09d1b8ae8eebb0dae175b.jpg?t%5B0%5D=thumbnail%3Awidth%3D490%2Cheight%3D277%2Cfit%3Doutbound&t%5B1%5D=strip&t%5B2%5D=compress%3Alevel%3D75&t%5B3%5D=progressive&accessToken=1a8fdab1a2ff952c651d3be45e6832877af4bb1d117f497907a26c3463849b61",
                 ingredients: ["kyllingkraft", "sitrongress", "fishsauce", "sukker", "kjøttdeig av svin", "reker", "ingefær", "hvitløksfedd", "vannkastanje", "sesamolje", "egg", "pasta", "vårløk", "pak choy", "koriander", "lime", "salt og nykvernet pepper"],
                 order: 7))
+
+        // last one
+        checkRecipe(processedRecipes![49], RecipesProvider.RecipeData(
+                title: "Marmorkake",
+                fullDescription: "En marmorkake byr på enkle og gode smaker og er høyt elsket av store og små.",
+                imageUrl: "https://imbo.vgc.no/users/godt/images/0dee26ba4e62111406e70fa05137ae0b.jpg?t%5B0%5D=thumbnail%3Awidth%3D490%2Cheight%3D277%2Cfit%3Doutbound&t%5B1%5D=strip&t%5B2%5D=compress%3Alevel%3D75&t%5B3%5D=progressive&accessToken=a477c91737b3de554d95c1922701eb9d45ae2a2c3c3dc86c6d9ef8fb71da2cd9",
+                ingredients: ["smør", "sukker", "vaniljestang", "egg", "hvetemel", "bakepulver", "kakao"],
+                order: 49))
 
     }
 
