@@ -8,45 +8,54 @@ import UIKit
 import CoreData
 
 class RecipesProvider {
-    //TODO escaping
-    func fetch(completion: @escaping ([Recipe]) -> Void) {
+
+    init(context: NSManagedObjectContext) {
+        managedContext = context
+    }
+
+    private var managedContext: NSManagedObjectContext!
+
+    private var fetchCompletion: (([Recipe]?) -> Void)? = nil
+
+    private var fetchedRecipes = [Recipe]()
+
+
+    // MARK: Fetching of recipes
+
+    func fetch(completion: @escaping ([Recipe]?) -> Void) {
         print("Starting fetch...")
 
-        let url = URL(string: "http://www.godt.no/api/getRecipesListDetailed?tags=&size=thumbnail-medium&ratio=1&limit=50&from=0")!
-        let task = URLSession.shared.dataTask(with: url) { (data: Data?, response: URLResponse?, error: Error?) -> Void in
-            print("Fetch completion called")
+        fetchCompletion = completion
 
-            // TODO get MOC from somewhere
-            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-                print("Can't access AppDelegate.")
+        let url = URL(string: "http://www.godt.no/api/getRecipesListDetailed?tags=&size=thumbnail-medium&ratio=1&limit=50&from=0")!
+        let task = URLSession.shared.dataTask(with: url) { [unowned self] (jsonData: Data?, response: URLResponse?, error: Error?) -> Void in
+            print("JSON download completion called")
+
+            if jsonData == nil {
+                print("JSON download failed: \(error)")
+                self.finish(results: nil)
                 return
             }
-            let container = appDelegate.persistentContainer
-//            container.performBackgroundTask() { (context) in
 
-            let context = container.viewContext
-            context.performAndWait {
-                let recipeArray = self.createRecipes(from: data, in: context)
-                // TODO error?
-                // TODO weak self?
-                // TODO _ for unsused parameters
+            // process JSON and create Core Data objects
+            let recipesData = self.processRecipes(from: jsonData)
+            if recipesData == nil {
+                // processing downloaded JSON failed
+                self.finish(results: nil)
+            }
 
-                // save main MOC
-//                container.viewContext.performAndWait {
-//                    do {
-//                        print("SAVE MAIN")
-//                        try container.viewContext.save()
-//                    } catch {
-//                        // TODO error handling
-//                        print("Error saving main MOC")
-//                    }
-//                }
-
+            // store all processed recipes in Core Data
+            let result = self.storeRecipes(from: recipesData!)
+            if result {
                 // trigger image fetching
-                if recipeArray != nil {
-                    completion(recipeArray!)
-                    self.fetchImages(for: recipeArray!)
+                if self.fetchedRecipes.isEmpty {
+                    self.finish(results: self.fetchedRecipes)
+                } else {
+                    self.fetchImages()
                 }
+            } else {
+                // storing in Core Data failed
+                self.finish(results: nil)
             }
 
         }
@@ -54,44 +63,42 @@ class RecipesProvider {
 
     }
 
-    private func createRecipes(from jsonData: Data?, in managedContext: NSManagedObjectContext) -> [Recipe]? {
+    private func finish(results: [Recipe]?) {
+        // call completion on main thread
+        if (fetchCompletion != nil) {
+            if Thread.isMainThread {
+                print("Calling fetch completion")
+                fetchCompletion!(results)
+            } else {
+                DispatchQueue.main.sync {
+                    finish(results: results)
+                }
+            }
+        }
+    }
+
+    // MARK: Processing of JSON data
+
+    struct RecipeData {
+        let title: String
+        let fullDescription: String
+        let imageUrl: String
+        let ingredients: [String]
+        let order: Int16
+    }
+
+    func processRecipes(from jsonData: Data?) -> [RecipeData]? {
         guard let data = jsonData,
               let jsonRoot = try? JSONSerialization.jsonObject(with: data, options: []),
               let recipeListJson = jsonRoot as? [Any] else {
             print("Can't deserialize root JSON.")
-            return nil // TODO error handling
-        }
-
-        // delete all existing
-        let fetchAllRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Recipe") // TODO get name from somewhere
-//        let deleteAllRequest = NSBatchDeleteRequest(fetchRequest: fetchAllRequest)
-        do {
-            print("DELETE fetch MOC")
-//            let result = try managedContext.execute(deleteAllRequest)
-            let tmpRes = try managedContext.fetch(fetchAllRequest)
-            let tmpRecipes = tmpRes as! [Recipe]
-            for tmpR in tmpRecipes {
-                managedContext.delete(tmpR)
-            }
-            print("DELETE fetch MOC... done")
-        } catch {
-            // TODO error handling
-            print("Error deleting all recipies")
             return nil
         }
-        //TODO should we save?
-//        do {
-//            print("SAVE fetch MOC")
-//            try managedContext.save()
-//        } catch {
-//            fatalError("Failure to save context: \(error)")
-//        }
 
-        var recipeArray = [Recipe]()
+        var processedRecipes = [RecipeData]()
 
         var recipeNo: Int16 = 0
 
-        //TODO take 50 only
         for recipeJson in recipeListJson {
             guard let recipeDict = recipeJson as? [String: Any],
                   let title = recipeDict["title"] as? String,
@@ -100,7 +107,7 @@ class RecipesProvider {
                   let ingredientsArray = recipeDict["ingredients"] as? [Any]
                     else {
                 print("Can't parse recipe JSON.")
-                continue // TODO error handling
+                continue // just skip this one
             }
 
             // image
@@ -109,7 +116,7 @@ class RecipesProvider {
                   let imageUrl = imageDict["url"] as? String
                     else {
                 print("Can't parse image JSON.")
-                continue // TODO error handling
+                continue // just skip this one
             }
 
             // ingredients
@@ -119,7 +126,7 @@ class RecipesProvider {
                       let ingredientElementsArray = ingredientDict["elements"] as? [Any]
                         else {
                     print("Can't parse ingredients JSON.")
-                    continue // TODO error handling
+                    continue // just skip this one
                 }
 
                 for ingredientElementJson in ingredientElementsArray {
@@ -127,115 +134,157 @@ class RecipesProvider {
                           let ingredientName = ingredientElementDict["name"] as? String
                             else {
                         print("Can't parse ingredient element JSON.")
-                        continue // TODO error handling
+                        continue // just skip this one
                     }
                     ingredients.append(ingredientName)
                 }
             }
 
-            print("Got recipe: #\(recipeNo): '\(title)'") //, \n '\(description)', \n '\(imageUrl)', \n '\(ingredients)'")
+            //print("Got recipe: #\(recipeNo): '\(title)'") //, \n '\(description)', \n '\(imageUrl)', \n '\(ingredients)'")
 
-            let recipe = Recipe.create(inContext: managedContext, title, description, imageUrl, ingredients, recipeNo)
-            recipeArray.append(recipe)
+            // convert simple HTML tags from description (like <br>) into text
+            let descriptionData = description.data(using: String.Encoding.unicode, allowLossyConversion: true)!
+            let attributedDescription = try! NSAttributedString(data: descriptionData,
+                    options: [NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType], documentAttributes: nil)
+            let processedDescription = attributedDescription.string
+
+            // store recipe
+            let recipeData = RecipeData(title: title, fullDescription: processedDescription, imageUrl: imageUrl, ingredients: ingredients, order: recipeNo)
+            processedRecipes.append(recipeData)
 
             recipeNo += 1
+            if recipeNo == 50 {
+                break; // take 50 only
+            }
         }
 
-        // all recipes processed - save the managed context
-        // TODO if has changes
-        do {
-            print("SAVE fetch MOC")
-            try managedContext.save()
-        } catch {
-            fatalError("Failure to save context: \(error)")
-        }
-
-        print("Created \(recipeArray.count) recipes.")
-        return recipeArray
+        print("Processed \(processedRecipes.count) recipes.")
+        return processedRecipes
     }
 
-    private func fetchImages(for recipeArray: [Recipe]) {
+     private func storeRecipes(from dataToStore: [RecipesProvider.RecipeData]) -> Bool {
+        var result = true
+        self.managedContext.performAndWait { [unowned self] in
 
-        for recipe in recipeArray {
+            // delete all existing
+            Recipe.deleteAll(inContext: self.managedContext)
+
+            self.fetchedRecipes = [Recipe]()
+            for recipeData in dataToStore {
+                let recipe = Recipe.create(inContext: self.managedContext,
+                        recipeData.title, recipeData.fullDescription, recipeData.imageUrl, recipeData.ingredients, recipeData.order)
+                self.fetchedRecipes.append(recipe)
+            }
+
+            // all recipes processed - save the managed context
+            do {
+                try self.managedContext.save()
+            } catch {
+                print("Failed to save context: \(error)")
+                result = false
+            }
+        }
+        return result
+    }
+
+
+    // MARK: Fetching of images
+
+    private func fetchImages() {
+
+        imageFetchingStarted()
+
+        for recipe in fetchedRecipes {
             guard let urlString = recipe.imageUrl,
                   let url = URL(string: urlString) else {
                 print("Invalid image url for recipe \(recipe.title)")
+                imageFetchFinished()
                 continue
             }
-            
 
             let recipeNumber = recipe.order
-            print("Starting download for recipe \(recipeNumber)")
-            //TODO get moc
-            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-                print("Can't access AppDelegate.")
-                return
-            }
-            let container = appDelegate.persistentContainer
+            //print("Starting download for recipe \(recipeNumber)")
 
-            let task = URLSession.shared.downloadTask(with: url) { (location: URL?, response: URLResponse?, error: Error?) -> Void in
-
-                print("Download completion called for #: \(recipeNumber)")
+            // download the image
+            let task = URLSession.shared.downloadTask(with: url) { [unowned self] (location: URL?, response: URLResponse?, error: Error?) -> Void in
+                //print("Download completion called for #: \(recipeNumber)")
 
                 // copy the temp file
                 guard let downloadLocation = location else {
                     print("Download failed (no location)")
+                    self.imageFetchFinished()
                     return
                 }
 
-                let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
+                let documentsPath = Recipe.imageBasePath
                 let fileName = "Recipe-\(recipeNumber).png"
                 let imagePathUrl = URL(fileURLWithPath: documentsPath).appendingPathComponent(fileName)
                 do {
                     try FileManager.default.moveItem(at: downloadLocation, to: imagePathUrl)
                 } catch {
-
+                    print("Moving of image file failed: \(error)")
+                    self.imageFetchFinished()
+                    return
                 }
 
-//                container.performBackgroundTask() { (managedContext) in
-                let managedContext = container.viewContext
-                container.viewContext.performAndWait {
-
-                    let fetchRecipeRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Recipe") // TODO get name from somewhere
+                // set path to downloaded image in the relevant Recipe object
+                self.managedContext.performAndWait { [unowned self] in
+                    let fetchRecipeRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Recipe")
                     fetchRecipeRequest.predicate = NSPredicate(format: "imageUrl == %@", urlString)
-                    guard let result = try? managedContext.fetch(fetchRecipeRequest),
+                    guard let result = try? self.managedContext.fetch(fetchRecipeRequest),
                           let loadedRecipesArray = result as? [Recipe] else {
-                        // TODO error handling
-                        print("Error loading recipes after download")
+                        print("Error loading recipes after image download")
+                        self.imageFetchFinished()
                         return
                     }
 
+                    // set local path to image in the recipe
                     for loadedRecipe in loadedRecipesArray {
-                        print("Download completion for recipe \(loadedRecipe.order) '\(loadedRecipe.title)' called with location \(location)")
-
                         loadedRecipe.imagePath = fileName
-                        print("Saved to \(loadedRecipe.imagePath)")
                     }
 
                     do {
-                        print("SAVE download MOC")
-                        try managedContext.save()
+                        try self.managedContext.save()
                     } catch {
-                        fatalError("Failure to save context: \(error)")
+                        print("Failed to save context: \(error)")
+                        self.imageFetchFinished()
+                        return
                     }
-//                    // save main MOC
-//                    container.viewContext.performAndWait {
-//                        do {
-//                            print("SAVE MAIN")
-//                            try container.viewContext.save()
-//                        } catch {
-//                            // TODO error handling
-//                            print("Error saving main MOC")
-//                        }
-//                    }
 
+                    // finished!
+                    self.imageFetchFinished()
                 }
-
-
             }
             task.resume()
         }
     }
 
+    private var leftToFetch = 0
+
+    private func imageFetchingStarted() {
+        // sync on the main thread
+        if Thread.isMainThread {
+            leftToFetch = fetchedRecipes.count
+        } else {
+            DispatchQueue.main.sync {
+                imageFetchingStarted()
+            }
+        }
+    }
+
+    private func imageFetchFinished() {
+        // sync on the main thread
+        if Thread.isMainThread {
+            leftToFetch -= 1
+            if leftToFetch == 0 {
+                // this was the last one - call overall completion
+                finish(results: fetchedRecipes)
+            }
+        } else {
+            DispatchQueue.main.sync {
+                imageFetchFinished()
+            }
+        }
+    }
 
 }

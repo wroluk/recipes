@@ -11,41 +11,56 @@ import CoreData
 
 class RecipeTableViewController: UITableViewController, NSFetchedResultsControllerDelegate, UISearchResultsUpdating {
 
-    private let dataProvider = RecipesProvider()
+    private var managedContext: NSManagedObjectContext!
+    private var dataProvider: RecipesProvider!
 
-    @IBAction func fetchPressed(_ sender: UIBarButtonItem) {
-        //let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
-        dataProvider.fetch { result in
-            print("DONE!")
-        }
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
+        // get the managed object context from the AppDelegate
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            fatalError("Can't access AppDelegate.") // should not happen
+        }
+        managedContext = appDelegate.persistentContainer.viewContext
 
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        dataProvider = RecipesProvider(context: managedContext)
 
         initializeFetchedResultsController()
 
-        //TODO test if this works
-        if fetchedResultsController.sections?.first?.numberOfObjects == 0 {
-            print("FETCHING!")
-            dataProvider.fetch { result in
-                print("DONE!")
-            }
-        }
-
         initializeSearchController()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        if fetchedResultsController.sections?.first?.numberOfObjects == 0 {
+            fetchRecipes()
+        }
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+
+    // MARK: Fetching of recipes
+
+    @IBAction func fetchPressed(_ sender: UIBarButtonItem) {
+        fetchRecipes()
+    }
+
+    private func fetchRecipes() {
+        let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+        let activityBarItem = UIBarButtonItem(customView: activityIndicator);
+        let currentBarItem = navigationItem.rightBarButtonItem
+        navigationItem.rightBarButtonItem = activityBarItem;
+        activityIndicator.startAnimating()
+
+        dataProvider.fetch { result in
+            self.navigationItem.rightBarButtonItem = currentBarItem;
+        }
+    }
+
 
     // MARK: - Table view data source
 
@@ -54,79 +69,28 @@ class RecipeTableViewController: UITableViewController, NSFetchedResultsControll
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let sections = fetchedResultsController.sections else {
-            fatalError("No sections in fetchedResultsController")
-            // TODO error handling
-        }
-        return sections[section].numberOfObjects
+        return fetchedResultsController.sections![section].numberOfObjects
     }
 
-    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "RecipeTableViewCell", for: indexPath) as! RecipeTableViewCell
 
         // Set up the cell
         guard let fetchedObject = self.fetchedResultsController?.object(at: indexPath),
                 let recipe = fetchedObject as? Recipe else {
-            fatalError("Attempt to configure cell without a managed object")
-            // TODO error handling
+            fatalError("Failed to obtain managed object!")
         }
 
         cell.titleLabel.text = recipe.title
-        cell.shortDescriptionLabel.text = recipe.fullDescription // TODO cut it?
-
+        cell.shortDescriptionLabel.text = recipe.fullDescription
         cell.thumbnailImageView?.image = recipe.image()
 
         return cell
     }
 
-    //TODO remove this
-//    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        tableView.deselectRow(at: indexPath, animated: true)
-//
-//
-//        performSegue(withIdentifier: "ShowRecipeDetail", sender: self)
-//
-//    }
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
 
     // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if (segue.identifier == "ShowRecipeDetail") {
             // get recipe detail VC
@@ -139,7 +103,6 @@ class RecipeTableViewController: UITableViewController, NSFetchedResultsControll
                 let fetchedObject = self.fetchedResultsController?.object(at: indexPath),
                 let recipe = fetchedObject as? Recipe else {
                 print("Can't configure detail VC")
-                // TODO error handling
                 return
             }
 
@@ -165,12 +128,11 @@ class RecipeTableViewController: UITableViewController, NSFetchedResultsControll
         let newString = searchController.searchBar.text != nil ? searchController.searchBar.text! : ""
         if (newString != searchString) {
             searchString = newString
-            print("Search: \(searchString)")
+            // print("Search: \(searchString)")
             initializeFetchedResultsController()
             tableView.reloadData()
         }
     }
-
 
 
     // MARK: - FetchResultsController Delegate
@@ -178,20 +140,12 @@ class RecipeTableViewController: UITableViewController, NSFetchedResultsControll
     var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>!
 
     func initializeFetchedResultsController() {
-        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Recipe") // TODO get name from somewhere
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Recipe")
         if !searchString.isEmpty {
             let predicate = NSPredicate(format: "title CONTAINS[cd] %@ || ingredients CONTAINS[cd] %@", searchString, searchString)
             request.predicate = predicate
         }
-        let departmentSort = NSSortDescriptor(key: "order", ascending: true)
-        request.sortDescriptors = [departmentSort]
-
-        // TODO get MOC from somewhere
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            print("Can't access AppDelegate.")
-            fatalError("Cant access AppDelegate")
-        }
-        let managedContext = appDelegate.persistentContainer.viewContext
+        request.sortDescriptors = [NSSortDescriptor(key: "order", ascending: true)]
 
         fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: managedContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
@@ -199,9 +153,8 @@ class RecipeTableViewController: UITableViewController, NSFetchedResultsControll
         do {
             try fetchedResultsController.performFetch()
         } catch {
-            fatalError("Failed to initialize FetchedResultsController: \(error)")
+            print("Failed to initialize FetchedResultsController: \(error)")
         }
-
     }
 
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {

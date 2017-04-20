@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6245E9601EA90366002F1E7A /* sampleData.json in Resources */ = {isa = PBXBuildFile; fileRef = 858F29E4D14AEB9C684849EF /* sampleData.json */; };
 		627921371E9F8AAD00F9B150 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 627921361E9F8AAD00F9B150 /* AppDelegate.swift */; };
-		627921391E9F8AAD00F9B150 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 627921381E9F8AAD00F9B150 /* ViewController.swift */; };
 		6279213C1E9F8AAD00F9B150 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6279213A1E9F8AAD00F9B150 /* Main.storyboard */; };
 		6279213F1E9F8AAD00F9B150 /* Godt_Recipies.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6279213D1E9F8AAD00F9B150 /* Godt_Recipies.xcdatamodeld */; };
 		627921411E9F8AAD00F9B150 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 627921401E9F8AAD00F9B150 /* Assets.xcassets */; };
@@ -18,6 +18,7 @@
 		6279215E1E9F92BB00F9B150 /* RecipeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6279215D1E9F92BB00F9B150 /* RecipeTableViewController.swift */; };
 		628D5F421EA661C400966BF6 /* RecipeDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 628D5F411EA661C400966BF6 /* RecipeDetailViewController.swift */; };
 		858F2604F88028B784E49111 /* Recipe+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858F20FD84EC8D7CB61E2E0D /* Recipe+Extensions.swift */; };
+		858F2A4E5686A00790817217 /* sampleData.json in Resources */ = {isa = PBXBuildFile; fileRef = 858F29E4D14AEB9C684849EF /* sampleData.json */; };
 		858F2E3DE829D72026F87B98 /* RecipesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858F2010A6AFCAEAE61E5C4F /* RecipesProvider.swift */; };
 /* End PBXBuildFile section */
 
@@ -34,7 +35,6 @@
 /* Begin PBXFileReference section */
 		627921331E9F8AAD00F9B150 /* Godt Recipies.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Godt Recipies.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		627921361E9F8AAD00F9B150 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		627921381E9F8AAD00F9B150 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		6279213B1E9F8AAD00F9B150 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		6279213E1E9F8AAD00F9B150 /* Godt_Recipies.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Godt_Recipies.xcdatamodel; sourceTree = "<group>"; };
 		627921401E9F8AAD00F9B150 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -48,6 +48,7 @@
 		628D5F411EA661C400966BF6 /* RecipeDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecipeDetailViewController.swift; sourceTree = "<group>"; };
 		858F2010A6AFCAEAE61E5C4F /* RecipesProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecipesProvider.swift; sourceTree = "<group>"; };
 		858F20FD84EC8D7CB61E2E0D /* Recipe+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Recipe+Extensions.swift"; sourceTree = "<group>"; };
+		858F29E4D14AEB9C684849EF /* sampleData.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = sampleData.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,7 +91,6 @@
 			isa = PBXGroup;
 			children = (
 				627921361E9F8AAD00F9B150 /* AppDelegate.swift */,
-				627921381E9F8AAD00F9B150 /* ViewController.swift */,
 				6279213A1E9F8AAD00F9B150 /* Main.storyboard */,
 				628D5F411EA661C400966BF6 /* RecipeDetailViewController.swift */,
 				627921591E9F928B00F9B150 /* RecipeTableViewCell.swift */,
@@ -110,6 +110,7 @@
 			children = (
 				6279214E1E9F8AAD00F9B150 /* Godt_RecipiesTests.swift */,
 				627921501E9F8AAD00F9B150 /* Info.plist */,
+				858F29E4D14AEB9C684849EF /* sampleData.json */,
 			);
 			path = "Godt RecipiesTests";
 			sourceTree = "<group>";
@@ -202,6 +203,7 @@
 				627921441E9F8AAD00F9B150 /* LaunchScreen.storyboard in Resources */,
 				627921411E9F8AAD00F9B150 /* Assets.xcassets in Resources */,
 				6279213C1E9F8AAD00F9B150 /* Main.storyboard in Resources */,
+				858F2A4E5686A00790817217 /* sampleData.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,6 +211,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6245E9601EA90366002F1E7A /* sampleData.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -219,7 +222,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				627921391E9F8AAD00F9B150 /* ViewController.swift in Sources */,
 				627921371E9F8AAD00F9B150 /* AppDelegate.swift in Sources */,
 				628D5F421EA661C400966BF6 /* RecipeDetailViewController.swift in Sources */,
 				6279213F1E9F8AAD00F9B150 /* Godt_Recipies.xcdatamodeld in Sources */,

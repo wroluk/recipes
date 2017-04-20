@@ -14,7 +14,19 @@ class RecipeDetailViewController: UIViewController {
     @IBOutlet weak var descriptionLabel: UILabel!
     @IBOutlet weak var ingredientsLabel: UILabel!
 
-    var recipe: Recipe? = nil
+    let imagePathKeyPath = "imagePath"
+
+    var recipe: Recipe? = nil {
+        didSet {
+            // the image might not be downloaded - listen to change of imagePath
+            if (oldValue != nil) {
+                unregisterKVO(oldValue!)
+            }
+            if (recipe != nil) {
+                registerKVO(recipe!)
+            }
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,27 +36,27 @@ class RecipeDetailViewController: UIViewController {
         super.viewWillAppear(animated)
 
         title = recipe?.title
-        descriptionLabel.text = recipe?.fullDescription //TODO use WebView for description as it contains links and other HTML tags
+        descriptionLabel.text = recipe?.fullDescription
         ingredientsLabel.text = recipe?.ingredients
         imageView.image = recipe?.image()
-
-        //TODO deregister old
-        // the image might not be loaded yet
-        if (recipe != nil) {
-            recipe!.addObserver(self, forKeyPath: "imagePath", options: [], context: nil)
-        }
-
     }
 
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-
+    deinit {
+        // stop listening on image path change
         if (recipe != nil) {
-            recipe!.removeObserver(self, forKeyPath: "imagePath")
+            unregisterKVO(recipe!)
         }
-
     }
 
+    // MARK: KVO for image downloading
+
+    private func registerKVO(_ object: Recipe) {
+        object.addObserver(self, forKeyPath: imagePathKeyPath, options: [], context: nil)
+    }
+
+    private func unregisterKVO(_ object: Recipe) {
+        object.removeObserver(self, forKeyPath: imagePathKeyPath)
+    }
 
     override func observeValue(forKeyPath keyPath: String?,
                       of object: Any?,
@@ -54,10 +66,9 @@ class RecipeDetailViewController: UIViewController {
             return;
         }
 
-        if keyPath == "imagePath" {
+        if keyPath == imagePathKeyPath {
             let image = recipe.image()
-            //TODO weak self
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [unowned self] in
                 self.imageView.image = image
             }
         }
@@ -67,17 +78,5 @@ class RecipeDetailViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
